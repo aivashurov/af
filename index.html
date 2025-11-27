@@ -45,9 +45,11 @@
       -webkit-text-size-adjust: 100%;
     }
 
+    /* iOS Safari fix: dynamic viewport height */
     .app {
       width: 100vw;
-      height: 100vh;
+      height: 100vh;   /* fallback */
+      height: 100dvh;  /* iOS 16+ correct */
       background: var(--chat-bg);
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -67,11 +69,11 @@
     }
 
     /* =========================
-       Header (аккуратнее на мобилке)
+       Header (ниже/компактнее)
        ========================= */
     header {
-      padding-top: calc(var(--safe-top) + 10px);
-      padding-bottom: 8px;
+      padding-top: calc(var(--safe-top) + 6px);
+      padding-bottom: 6px;
       background: var(--nav-bg);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -84,7 +86,7 @@
       align-items: center;
 
       padding-inline: 12px;
-      min-height: 76px;
+      min-height: 64px;
       user-select: none;
     }
 
@@ -92,7 +94,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 4px;
+      gap: 3px;
       min-width: 0;
       transform: translateY(1px);
     }
@@ -153,24 +155,32 @@
        Chat layout
        ========================= */
     main {
-      padding: 8px 10px 14px;
+      padding: 6px 10px 12px; /* верх чуть плотнее */
       overflow: auto;
       scroll-behavior: smooth;
-      -webkit-overflow-scrolling: touch; /* iOS smoother */
+      -webkit-overflow-scrolling: touch;
     }
     .chat {
       display: flex; flex-direction: column;
       gap: 0;
     }
 
+    /* обычная дата */
     .time-separator {
       align-self: center;
-      margin: 10px 0 6px;
+      margin: 6px 0 4px;
       font-size: 12px;
       color: var(--time-sep);
       font-weight: 600;
       letter-spacing: 0.2px;
       text-align: center;
+    }
+
+    /* системный баннер (верхняя фраза) */
+    .time-separator.system {
+      margin: 10px 0 6px;
+      color: var(--subtext);
+      font-weight: 600;
     }
 
     .row {
@@ -274,10 +284,10 @@
     }
 
     /* =========================
-       Footer / Input (fix iOS Safari overlap)
+       Footer / Input (iOS Safari safe)
        ========================= */
     footer {
-      padding: 8px 8px calc(12px + var(--safe-bottom)); /* чуть больше снизу */
+      padding: 8px 8px calc(12px + var(--safe-bottom));
       background: var(--nav-bg);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -286,14 +296,14 @@
     }
 
     .input-row {
-      display: flex;                /* было grid → flex стабильнее на iOS */
+      display: flex;
       align-items: flex-end;
       gap: 8px;
       background: var(--input-bg);
       border: 1px solid var(--input-stroke);
       border-radius: 20px;
       padding: 6px 6px 6px 10px;
-      min-height: 44px;             /* “родная” высота iOS поля */
+      min-height: 44px;
     }
 
     textarea {
@@ -305,11 +315,11 @@
       outline: none;
       border: none;
       background: transparent;
-      font-size: 16px;             /* важно для iOS (чтобы не зумило) */
+      font-size: 16px;
       line-height: 1.32;
       color: var(--input-text);
       font-family: var(--font);
-      padding: 6px 8px 6px 2px;    /* справа добавил — чтобы текст не лез под кнопку */
+      padding: 6px 8px 6px 2px;
     }
     textarea::placeholder { color: var(--placeholder); }
 
@@ -326,7 +336,7 @@
       font-weight: 900;
       box-shadow: 0 6px 14px rgba(10,132,255,0.45);
       transition: transform .08s ease;
-      margin-bottom: 1px;          /* визуально ровнее с текстом */
+      margin-bottom: 1px;
     }
     .send:active { transform: translateY(1px) scale(0.98); }
     .send svg { width: 17px; height: 17px; transform: translateX(1px); }
@@ -396,7 +406,8 @@
       <div class="nav-center">
         <div class="nav-topline">
           <div class="avatar" aria-label="Аватар">
-            <img src="./img.jpg" alt="" onerror="this.remove(); this.parentNode.querySelector('.avatar-fallback').style.display='grid'">
+            <img src="./img.jpg" alt=""
+                 onerror="this.remove(); this.parentNode.querySelector('.avatar-fallback').style.display='grid'">
             <div class="avatar-fallback" style="display:none;">АФ</div>
           </div>
           <div class="nav-title">Алексей Филиппов</div>
@@ -486,6 +497,7 @@
     function addSeparator(label) {
       const sep = document.createElement("div");
       sep.className = "time-separator";
+      if (label === ALWAYS_TOP_SYSTEM_TEXT) sep.classList.add("system");
       sep.textContent = label;
       chatEl.appendChild(sep);
       lastMessageRow = null;
@@ -501,7 +513,6 @@
     function clearGroupClasses(bubble) {
       bubble.classList.remove("group-solo","group-start","group-mid","group-end");
     }
-
     function setGroupClass(bubble, cls) {
       clearGroupClasses(bubble);
       bubble.classList.add(cls);
