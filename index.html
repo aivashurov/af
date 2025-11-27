@@ -8,28 +8,21 @@
   <style>
     :root {
       --font: system-ui, -apple-system, "SF Pro Text", "SF Pro Display", Segoe UI, Roboto, Arial, sans-serif;
-
       --chat-bg: #f2f2f7;
       --nav-bg: rgba(248, 248, 248, 0.92);
       --nav-stroke: rgba(0,0,0,0.08);
       --text: #111;
       --subtext: rgba(17,17,17,0.55);
-
       --bubble-in-bg: #e9e9eb;
       --bubble-in-text: #111;
-
       --bubble-out-bg: #007aff;
       --bubble-out-text: #fff;
-
       --time-sep: rgba(60,60,67,0.6);
-
       --input-bg: rgba(255,255,255,0.98);
       --input-stroke: rgba(0,0,0,0.12);
       --input-text: #111;
       --placeholder: rgba(0,0,0,0.35);
-
       --accent: #007aff;
-
       --safe-bottom: env(safe-area-inset-bottom);
       --safe-top: env(safe-area-inset-top);
     }
@@ -45,11 +38,10 @@
       -webkit-text-size-adjust: 100%;
     }
 
-    /* iOS Safari fix: dynamic viewport height */
     .app {
       width: 100vw;
-      height: 100vh;   /* fallback */
-      height: 100dvh;  /* iOS 16+ correct */
+      height: 100vh;
+      height: 100dvh;
       background: var(--chat-bg);
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -68,9 +60,6 @@
       mix-blend-mode: soft-light;
     }
 
-    /* =========================
-       Header (ниже/компактнее)
-       ========================= */
     header {
       padding-top: calc(var(--safe-top) + 6px);
       padding-bottom: 6px;
@@ -151,11 +140,8 @@
     .dot.ok { background: #71f3a1; box-shadow: 0 0 6px #71f3a1aa; }
     .dot.err { background: #ff7a7a; box-shadow: 0 0 6px #ff7a7aaa; }
 
-    /* =========================
-       Chat layout
-       ========================= */
     main {
-      padding: 6px 10px 12px; /* верх чуть плотнее */
+      padding: 6px 10px 12px;
       overflow: auto;
       scroll-behavior: smooth;
       -webkit-overflow-scrolling: touch;
@@ -165,7 +151,6 @@
       gap: 0;
     }
 
-    /* обычная дата */
     .time-separator {
       align-self: center;
       margin: 6px 0 4px;
@@ -176,7 +161,6 @@
       text-align: center;
     }
 
-    /* системный баннер (верхняя фраза) */
     .time-separator.system {
       margin: 10px 0 6px;
       color: var(--subtext);
@@ -283,9 +267,6 @@
       40% { transform: translateY(-4px); opacity: 1; }
     }
 
-    /* =========================
-       Footer / Input (iOS Safari safe)
-       ========================= */
     footer {
       padding: 8px 8px calc(12px + var(--safe-bottom));
       background: var(--nav-bg);
@@ -348,7 +329,6 @@
       .nav-title { font-size: 16px; }
     }
 
-    /* Action sheet */
     .sheet-backdrop {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.35);
@@ -422,7 +402,7 @@
     <main id="main">
       <div id="chat" class="chat" aria-live="polite"></div>
       <div id="empty" class="empty" hidden>
-        Напиши любую тему — получишь случайный ответ 🙂
+        Пиши, хули.
       </div>
     </main>
 
@@ -601,7 +581,7 @@
 
     function randInt(n) { return Math.floor(Math.random()*n); }
     function pickRandomPhrase() {
-      if (!phrases.length) return "Фраз нет 😅";
+      if (!phrases.length) return "Ты долбоёб?";
       return phrases[randInt(phrases.length)];
     }
 
