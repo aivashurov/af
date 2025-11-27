@@ -9,7 +9,7 @@
     :root {
       --font: system-ui, -apple-system, "SF Pro Text", "SF Pro Display", Segoe UI, Roboto, Arial, sans-serif;
 
-      /* Light */
+      /* Light only */
       --chat-bg: #f2f2f7;
       --nav-bg: rgba(248, 248, 248, 0.92);
       --nav-stroke: rgba(0,0,0,0.08);
@@ -35,29 +35,6 @@
       --safe-top: env(safe-area-inset-top);
     }
 
-    [data-theme="dark"] {
-      --chat-bg: #000000;
-      --nav-bg: rgba(18,18,18,0.92);
-      --nav-stroke: rgba(255,255,255,0.08);
-      --text: #fff;
-      --subtext: rgba(235,235,245,0.6);
-
-      --bubble-in-bg: #2c2c2e;
-      --bubble-in-text: #fff;
-
-      --bubble-out-bg: #0a84ff;
-      --bubble-out-text: #fff;
-
-      --time-sep: rgba(235,235,245,0.6);
-
-      --input-bg: rgba(28,28,30,0.98);
-      --input-stroke: rgba(255,255,255,0.12);
-      --input-text: #fff;
-      --placeholder: rgba(255,255,255,0.45);
-
-      --accent: #0a84ff;
-    }
-
     * { box-sizing: border-box; }
     html, body { height: 100%; }
 
@@ -78,6 +55,7 @@
       overflow: hidden;
     }
 
+    /* subtle iOS noise */
     .app::after {
       content:"";
       position:absolute; inset:0; pointer-events:none;
@@ -89,6 +67,9 @@
       mix-blend-mode: soft-light;
     }
 
+    /* =========================
+       iOS navbar
+       ========================= */
     header {
       padding-top: calc(var(--safe-top) + 6px);
       padding-bottom: 10px;
@@ -157,21 +138,9 @@
     .dot.ok { background: #71f3a1; box-shadow: 0 0 6px #71f3a1aa; }
     .dot.err { background: #ff7a7a; box-shadow: 0 0 6px #ff7a7aaa; }
 
-    .nav-right {
-      position: absolute;
-      right: 8px;
-      top: calc(var(--safe-top) + 8px);
-      display: flex; align-items: center;
-    }
-
-    .theme-btn {
-      background: transparent; border: none; cursor: pointer;
-      color: var(--accent);
-      font-size: 15px; font-weight: 700;
-      padding: 6px 8px; border-radius: 10px;
-    }
-    .theme-btn:active { transform: translateY(1px); }
-
+    /* =========================
+       Chat layout
+       ========================= */
     main {
       padding: 8px 10px 12px;
       overflow: auto;
@@ -179,7 +148,7 @@
     }
     .chat {
       display: flex; flex-direction: column;
-      gap: 6px;
+      gap: 0; /* gap контролируем через margin у .row */
     }
 
     .time-separator {
@@ -196,8 +165,13 @@
       width: 100%;
       display: flex;
       align-items: flex-end;
+      margin-top: 8px;              /* между сериями */
       animation: pop .18s ease-out;
     }
+    .row.in-series {
+      margin-top: 2px;              /* внутри серии */
+    }
+
     @keyframes pop {
       from { transform: translateY(6px) scale(.985); opacity:0; }
       to   { transform: translateY(0) scale(1); opacity:1; }
@@ -213,6 +187,9 @@
       position: relative;
     }
 
+    /* =========================
+       iOS BUBBLES + grouping (NO tails)
+       ========================= */
     .bubble {
       position: relative;
       max-width: 100%;
@@ -221,51 +198,33 @@
       line-height: 1.35;
       white-space: pre-wrap;
       word-break: break-word;
+      border-radius: 18px;
     }
-
-    /* =========================
-       iOS BUBBLES — ФИНАЛЬНЫЙ ХВОСТ (одинарный)
-       ========================= */
 
     .bubble.in {
       background: var(--bubble-in-bg);
       color: var(--bubble-in-text);
-      border-radius: 18px 18px 18px 6px;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.03) inset;
     }
-
-    .bubble.in::after {
-      content:"";
-      position:absolute;
-      left:-5px;
-      bottom:3px;
-      width:10px;
-      height:10px;
-      background: var(--bubble-in-bg);
-      border-radius: 0 0 0 10px;
-      transform: rotate(45deg);
-      /* прячем шов в цвет бабла */
-      box-shadow: -2px 2px 0 var(--bubble-in-bg);
-    }
-
     .bubble.out {
       background: var(--bubble-out-bg);
       color: var(--bubble-out-text);
-      border-radius: 18px 18px 6px 18px;
-      box-shadow: 0 6px 14px rgba(10,132,255,0.30);
+      box-shadow:
+        0 6px 14px rgba(10,132,255,0.20),
+        0 1px 0 rgba(255,255,255,0.18) inset;
     }
 
-    .bubble.out::after {
-      content:"";
-      position:absolute;
-      right:-5px;
-      bottom:3px;
-      width:10px;
-      height:10px;
-      background: var(--bubble-out-bg);
-      border-radius: 0 0 10px 0;
-      transform: rotate(45deg);
-      box-shadow: 2px 2px 0 var(--bubble-out-bg);
-    }
+    /* Incoming (left) grouping radii */
+    .bubble.in.group-solo { border-radius: 18px 18px 18px 10px; }
+    .bubble.in.group-start{ border-radius: 18px 18px 18px 6px; }
+    .bubble.in.group-mid  { border-radius: 8px  18px 18px 6px; }
+    .bubble.in.group-end  { border-radius: 8px  18px 18px 18px; }
+
+    /* Outgoing (right) grouping radii */
+    .bubble.out.group-solo { border-radius: 18px 18px 10px 18px; }
+    .bubble.out.group-start{ border-radius: 18px 18px 6px  18px; }
+    .bubble.out.group-mid  { border-radius: 18px 8px  6px  18px; }
+    .bubble.out.group-end  { border-radius: 18px 8px  18px 18px; }
 
     .msg-time {
       font-size: 11px;
@@ -288,10 +247,8 @@
       font-weight: 600;
       text-align: center;
     }
-    [data-theme="dark"] .empty {
-      background: rgba(235,235,245,0.12);
-    }
 
+    /* Typing indicator */
     .typing {
       display: inline-flex;
       gap: 4px;
@@ -304,9 +261,6 @@
       background: rgba(0,0,0,0.34);
       animation: bounce 1.1s infinite ease-in-out;
     }
-    [data-theme="dark"] .typing .dotty {
-      background: rgba(255,255,255,0.45);
-    }
     .typing .dotty:nth-child(2) { animation-delay: .15s; }
     .typing .dotty:nth-child(3) { animation-delay: .3s; }
     @keyframes bounce {
@@ -314,6 +268,7 @@
       40% { transform: translateY(-4px); opacity: 1; }
     }
 
+    /* Input bar */
     footer {
       padding: 8px 8px calc(8px + var(--safe-bottom));
       background: var(--nav-bg);
@@ -368,24 +323,6 @@
     .send:active { transform: translateY(1px) scale(0.98); }
     .send svg { width: 17px; height: 17px; transform: translateX(1px); }
 
-    .footer-hint {
-      display: flex;
-      justify-content: flex-end;
-      padding: 0 4px;
-    }
-    .chip {
-      font-size: 11px;
-      color: var(--subtext);
-      background: rgba(60,60,67,0.10);
-      border-radius: 999px;
-      padding: 4px 8px;
-      user-select:none;
-      font-weight: 600;
-    }
-    [data-theme="dark"] .chip {
-      background: rgba(235,235,245,0.12);
-    }
-
     @media (max-width: 520px) {
       .bubble { font-size: 15px; }
       .row.in { padding-right: 10%; }
@@ -393,6 +330,7 @@
       .nav-title { font-size: 16px; }
     }
 
+    /* Action sheet */
     .sheet-backdrop {
       position: fixed; inset: 0;
       background: rgba(0,0,0,0.35);
@@ -425,10 +363,6 @@
       -webkit-backdrop-filter: blur(20px);
       border: 1px solid rgba(0,0,0,0.06);
     }
-    [data-theme="dark"] .sheet-group {
-      background: rgba(28,28,30,0.95);
-      border: 1px solid rgba(255,255,255,0.08);
-    }
 
     .sheet-btn {
       width: 100%;
@@ -442,13 +376,9 @@
       cursor: pointer;
       border-top: 1px solid rgba(0,0,0,0.06);
     }
-    [data-theme="dark"] .sheet-btn {
-      border-top: 1px solid rgba(255,255,255,0.08);
-    }
     .sheet-btn:first-child { border-top: none; }
     .sheet-btn.destructive { color: #ff3b30; }
     .sheet-btn:active { background: rgba(0,0,0,0.05); }
-    [data-theme="dark"] .sheet-btn:active { background: rgba(255,255,255,0.06); }
   </style>
 </head>
 
@@ -464,10 +394,6 @@
           <span id="statusDot" class="dot"></span>
           <span id="statusText">Загружаю messages.csv…</span>
         </div>
-      </div>
-
-      <div class="nav-right">
-        <button id="themeBtn" class="theme-btn" title="Light/Dark">☀️</button>
       </div>
     </header>
 
@@ -487,9 +413,6 @@
           </svg>
         </button>
       </div>
-      <div class="footer-hint">
-        <div class="chip">Enter — отправить</div>
-      </div>
     </footer>
   </div>
 
@@ -504,14 +427,12 @@
 
   <script>
     const $ = (sel) => document.querySelector(sel);
-    const htmlEl = document.documentElement;
 
     const chatEl = $("#chat");
     const emptyEl = $("#empty");
     const mainEl = $("#main");
     const inputEl = $("#input");
     const sendBtn = $("#sendBtn");
-    const themeBtn = $("#themeBtn");
     const statusDot = $("#statusDot");
     const statusText = $("#statusText");
     const sheetBackdrop = $("#sheetBackdrop");
@@ -520,6 +441,9 @@
     let phrases = [];
     let lastSeparatorLabel = null;
     let pressedMessageEl = null;
+
+    // для серийности
+    let lastMessageRow = null;
 
     const ALWAYS_TOP_SYSTEM_TEXT = "Что об этом думает Алексей Ф.?";
 
@@ -555,6 +479,9 @@
       sep.className = "time-separator";
       sep.textContent = label;
       chatEl.appendChild(sep);
+
+      // новая “дата” = новая серия
+      lastMessageRow = null;
     }
 
     function maybeAddDateSeparator(date = new Date()) {
@@ -564,12 +491,59 @@
       addSeparator(label);
     }
 
+    function clearGroupClasses(bubble) {
+      bubble.classList.remove("group-solo","group-start","group-mid","group-end");
+    }
+
+    function setGroupClass(bubble, cls) {
+      clearGroupClasses(bubble);
+      bubble.classList.add(cls);
+    }
+
+    function updateGroupingForNewRow(newRow) {
+      const newSide = newRow.dataset.side;
+      const newBubble = newRow.querySelector(".bubble");
+
+      // по умолчанию — одиночное
+      setGroupClass(newBubble, "group-solo");
+
+      if (!lastMessageRow) {
+        lastMessageRow = newRow;
+        return;
+      }
+
+      const prevSide = lastMessageRow.dataset.side;
+      if (prevSide !== newSide) {
+        lastMessageRow = newRow;
+        return;
+      }
+
+      // если тот же автор → это серия
+      newRow.classList.add("in-series");
+
+      const prevBubble = lastMessageRow.querySelector(".bubble");
+
+      if (prevBubble.classList.contains("group-solo")) {
+        setGroupClass(prevBubble, "group-start");
+      } else if (prevBubble.classList.contains("group-end")) {
+        setGroupClass(prevBubble, "group-mid");
+      } else if (prevBubble.classList.contains("group-start")) {
+        setGroupClass(prevBubble, "group-mid");
+      }
+
+      // новое сообщение всегда конец серии
+      setGroupClass(newBubble, "group-end");
+
+      lastMessageRow = newRow;
+    }
+
     function addMessage(side, text, date = new Date(), { typing=false } = {}) {
       maybeAddDateSeparator(date);
       emptyEl.hidden = true;
 
       const row = document.createElement("div");
       row.className = `row ${side}`;
+      row.dataset.side = side;
 
       const wrap = document.createElement("div");
       wrap.className = "bubble-wrap";
@@ -598,8 +572,9 @@
       row.appendChild(wrap);
       chatEl.appendChild(row);
 
-      row.dataset.side = side;
       row.dataset.text = text;
+
+      updateGroupingForNewRow(row);
 
       attachPressHandlers(row);
       scrollToBottom();
@@ -743,22 +718,6 @@
     });
     sendBtn.addEventListener("click", sendUserMessage);
 
-    function applyTheme(theme) {
-      htmlEl.setAttribute("data-theme", theme);
-      localStorage.setItem("imessage-theme", theme);
-      themeBtn.textContent = theme === "dark" ? "🌙" : "☀️";
-    }
-    function initTheme() {
-      const saved = localStorage.getItem("imessage-theme");
-      if (saved === "dark" || saved === "light") return applyTheme(saved);
-      const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
-      applyTheme(prefersDark ? "dark" : "light");
-    }
-    themeBtn.addEventListener("click", () => {
-      const current = htmlEl.getAttribute("data-theme") || "light";
-      applyTheme(current === "light" ? "dark" : "light");
-    });
-
     function openSheetFor(rowEl) {
       pressedMessageEl = rowEl;
       const side = rowEl.dataset.side;
@@ -825,6 +784,7 @@
         chatEl.innerHTML = "";
         chatEl.dataset.hasSystem = "0";
         lastSeparatorLabel = null;
+        lastMessageRow = null;
         renderInitialSystemMessage();
         showEmptyIfNeeded();
       }
@@ -855,7 +815,6 @@
     }
 
     autoResize();
-    initTheme();
     loadMessages();
   </script>
 </body>
