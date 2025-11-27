@@ -16,7 +16,8 @@
       --text: #111;
       --subtext: rgba(17,17,17,0.55);
 
-      --bubble-in-bg: #e5e5ea;
+      /* чуть теплее, ближе к iOS */
+      --bubble-in-bg: #e9e9eb;
       --bubble-in-text: #111;
 
       --bubble-out-bg: #007aff;
@@ -103,13 +104,27 @@
       min-width: 0;
     }
 
+    /* аватар-кружок */
     .avatar {
       width: 32px; height: 32px; border-radius: 999px;
-      background: radial-gradient(circle at 30% 20%, #fff8, transparent 55%), linear-gradient(135deg, #6ad9ff, #8e7bff);
-      display: grid; place-items: center;
-      color: white; font-weight: 700; font-size: 14px;
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
+      overflow: hidden;
+      background: #d9d9dd;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
       flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+    }
+    .avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .avatar-fallback {
+      font-weight: 700; font-size: 14px; color: #fff;
+      background: linear-gradient(135deg, #6ad9ff, #8e7bff);
+      width: 100%; height: 100%;
+      display: grid; place-items: center;
     }
 
     .nav-title {
@@ -177,8 +192,9 @@
       to   { transform: translateY(0) scale(1); opacity:1; }
     }
 
-    .row.in { justify-content: flex-start; padding-right: 20%; }
-    .row.out { justify-content: flex-end; padding-left: 20%; }
+    /* сделали баблы чуть уже */
+    .row.in  { justify-content: flex-start; padding-right: 24%; }
+    .row.out { justify-content: flex-end;  padding-left: 24%; }
 
     .bubble-wrap {
       display: flex; flex-direction: column;
@@ -193,9 +209,9 @@
     .bubble {
       position: relative;
       max-width: 100%;
-      padding: 9px 12px;
+      padding: 8px 11px;     /* было 9/12 -> чуть компактнее */
       font-size: 16px;
-      line-height: 1.35;
+      line-height: 1.32;     /* было 1.35 -> чуть плотнее как iOS */
       white-space: pre-wrap;
       word-break: break-word;
       border-radius: 18px;
@@ -300,7 +316,7 @@
       border: none;
       background: transparent;
       font-size: 16px;
-      line-height: 1.35;
+      line-height: 1.32; /* под баблы */
       color: var(--input-text);
       font-family: var(--font);
       padding: 6px 4px;
@@ -325,8 +341,8 @@
 
     @media (max-width: 520px) {
       .bubble { font-size: 15px; }
-      .row.in { padding-right: 10%; }
-      .row.out { padding-left: 10%; }
+      .row.in  { padding-right: 12%; }
+      .row.out { padding-left: 12%; }
       .nav-title { font-size: 16px; }
     }
 
@@ -387,7 +403,11 @@
     <header>
       <div class="nav-center">
         <div class="nav-topline">
-          <div class="avatar">АФ</div>
+          <div class="avatar" aria-label="Аватар">
+            <!-- если img.jpg есть — покажется он, если нет — будет фолбэк -->
+            <img src="./img.jpg" alt="" onerror="this.remove(); this.parentNode.querySelector('.avatar-fallback').style.display='grid'">
+            <div class="avatar-fallback" style="display:none;">АФ</div>
+          </div>
           <div class="nav-title">Алексей Филиппов</div>
         </div>
         <div class="nav-sub">
@@ -479,9 +499,7 @@
       sep.className = "time-separator";
       sep.textContent = label;
       chatEl.appendChild(sep);
-
-      // новая “дата” = новая серия
-      lastMessageRow = null;
+      lastMessageRow = null; // новая дата = новая серия
     }
 
     function maybeAddDateSeparator(date = new Date()) {
@@ -504,7 +522,6 @@
       const newSide = newRow.dataset.side;
       const newBubble = newRow.querySelector(".bubble");
 
-      // по умолчанию — одиночное
       setGroupClass(newBubble, "group-solo");
 
       if (!lastMessageRow) {
@@ -518,7 +535,6 @@
         return;
       }
 
-      // если тот же автор → это серия
       newRow.classList.add("in-series");
 
       const prevBubble = lastMessageRow.querySelector(".bubble");
@@ -531,9 +547,7 @@
         setGroupClass(prevBubble, "group-mid");
       }
 
-      // новое сообщение всегда конец серии
       setGroupClass(newBubble, "group-end");
-
       lastMessageRow = newRow;
     }
 
@@ -587,7 +601,7 @@
 
     function randInt(n) { return Math.floor(Math.random()*n); }
     function pickRandomPhrase() {
-      if (!phrases.length) return "Фраз нет 😅";
+      if (!phrases.length) return "Ты долбоёб? Нахуя пустое сообщение отправил?";
       return phrases[randInt(phrases.length)];
     }
 
@@ -657,7 +671,7 @@
         phrases = rowsToPhrases(parseCSV(text));
         if (!phrases.length) throw new Error("CSV empty");
 
-        setStatus("ok", "Фразы загружены");
+        setStatus("ok", "online");
         renderInitialSystemMessage();
         showEmptyIfNeeded();
       } catch (e) {
