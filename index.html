@@ -9,14 +9,12 @@
     :root {
       --font: system-ui, -apple-system, "SF Pro Text", "SF Pro Display", Segoe UI, Roboto, Arial, sans-serif;
 
-      /* Light only */
       --chat-bg: #f2f2f7;
       --nav-bg: rgba(248, 248, 248, 0.92);
       --nav-stroke: rgba(0,0,0,0.08);
       --text: #111;
       --subtext: rgba(17,17,17,0.55);
 
-      /* чуть теплее, ближе к iOS */
       --bubble-in-bg: #e9e9eb;
       --bubble-in-text: #111;
 
@@ -44,6 +42,7 @@
       font-family: var(--font);
       background: var(--chat-bg);
       color: var(--text);
+      -webkit-text-size-adjust: 100%;
     }
 
     .app {
@@ -56,7 +55,6 @@
       overflow: hidden;
     }
 
-    /* subtle iOS noise */
     .app::after {
       content:"";
       position:absolute; inset:0; pointer-events:none;
@@ -69,11 +67,11 @@
     }
 
     /* =========================
-       iOS navbar
+       Header (аккуратнее на мобилке)
        ========================= */
     header {
-      padding-top: calc(var(--safe-top) + 6px);
-      padding-bottom: 10px;
+      padding-top: calc(var(--safe-top) + 10px);
+      padding-bottom: 8px;
       background: var(--nav-bg);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
@@ -86,7 +84,7 @@
       align-items: center;
 
       padding-inline: 12px;
-      min-height: 72px;
+      min-height: 76px;
       user-select: none;
     }
 
@@ -104,15 +102,13 @@
       min-width: 0;
     }
 
-    /* аватар-кружок */
     .avatar {
       width: 32px; height: 32px; border-radius: 999px;
       overflow: hidden;
       background: #d9d9dd;
       box-shadow: inset 0 0 0 1px rgba(255,255,255,0.7);
       flex: 0 0 auto;
-      display: grid;
-      place-items: center;
+      display: grid; place-items: center;
     }
     .avatar img {
       width: 100%;
@@ -157,13 +153,14 @@
        Chat layout
        ========================= */
     main {
-      padding: 8px 10px 12px;
+      padding: 8px 10px 14px;
       overflow: auto;
       scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch; /* iOS smoother */
     }
     .chat {
       display: flex; flex-direction: column;
-      gap: 0; /* gap контролируем через margin у .row */
+      gap: 0;
     }
 
     .time-separator {
@@ -180,19 +177,16 @@
       width: 100%;
       display: flex;
       align-items: flex-end;
-      margin-top: 8px;              /* между сериями */
+      margin-top: 8px;
       animation: pop .18s ease-out;
     }
-    .row.in-series {
-      margin-top: 2px;              /* внутри серии */
-    }
+    .row.in-series { margin-top: 2px; }
 
     @keyframes pop {
       from { transform: translateY(6px) scale(.985); opacity:0; }
       to   { transform: translateY(0) scale(1); opacity:1; }
     }
 
-    /* сделали баблы чуть уже */
     .row.in  { justify-content: flex-start; padding-right: 24%; }
     .row.out { justify-content: flex-end;  padding-left: 24%; }
 
@@ -203,18 +197,16 @@
       position: relative;
     }
 
-    /* =========================
-       iOS BUBBLES + grouping (NO tails)
-       ========================= */
     .bubble {
       position: relative;
       max-width: 100%;
-      padding: 8px 11px;     /* было 9/12 -> чуть компактнее */
+      padding: 8px 11px;
       font-size: 16px;
-      line-height: 1.32;     /* было 1.35 -> чуть плотнее как iOS */
+      line-height: 1.32;
       white-space: pre-wrap;
       word-break: break-word;
       border-radius: 18px;
+      background-clip: padding-box;
     }
 
     .bubble.in {
@@ -230,17 +222,15 @@
         0 1px 0 rgba(255,255,255,0.18) inset;
     }
 
-    /* Incoming (left) grouping radii */
     .bubble.in.group-solo { border-radius: 18px 18px 18px 10px; }
     .bubble.in.group-start{ border-radius: 18px 18px 18px 6px; }
     .bubble.in.group-mid  { border-radius: 8px  18px 18px 6px; }
     .bubble.in.group-end  { border-radius: 8px  18px 18px 18px; }
 
-    /* Outgoing (right) grouping radii */
-    .bubble.out.group-solo { border-radius: 18px 18px 10px 18px; }
-    .bubble.out.group-start{ border-radius: 18px 18px 6px  18px; }
-    .bubble.out.group-mid  { border-radius: 18px 8px  6px  18px; }
-    .bubble.out.group-end  { border-radius: 18px 8px  18px 18px; }
+    .bubble.out.group-solo  { border-radius: 18px 18px 10px 18px; }
+    .bubble.out.group-start { border-radius: 18px 18px 6px  18px; }
+    .bubble.out.group-mid   { border-radius: 18px 8px  6px  18px; }
+    .bubble.out.group-end   { border-radius: 18px 8px  18px 18px; }
 
     .msg-time {
       font-size: 11px;
@@ -264,7 +254,6 @@
       text-align: center;
     }
 
-    /* Typing indicator */
     .typing {
       display: inline-flex;
       gap: 4px;
@@ -284,46 +273,48 @@
       40% { transform: translateY(-4px); opacity: 1; }
     }
 
-    /* Input bar */
+    /* =========================
+       Footer / Input (fix iOS Safari overlap)
+       ========================= */
     footer {
-      padding: 8px 8px calc(8px + var(--safe-bottom));
+      padding: 8px 8px calc(12px + var(--safe-bottom)); /* чуть больше снизу */
       background: var(--nav-bg);
       backdrop-filter: blur(20px) saturate(180%);
       -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-top: 1px solid var(--nav-stroke);
-      display: grid;
-      gap: 6px;
       z-index: 2;
     }
 
     .input-row {
-      display: grid;
-      grid-template-columns: 1fr auto;
+      display: flex;                /* было grid → flex стабильнее на iOS */
+      align-items: flex-end;
       gap: 8px;
-      align-items: end;
       background: var(--input-bg);
       border: 1px solid var(--input-stroke);
       border-radius: 20px;
       padding: 6px 6px 6px 10px;
+      min-height: 44px;             /* “родная” высота iOS поля */
     }
 
     textarea {
-      width: 100%;
+      flex: 1 1 auto;
+      min-width: 0;
       min-height: 32px;
       max-height: 110px;
       resize: none;
       outline: none;
       border: none;
       background: transparent;
-      font-size: 16px;
-      line-height: 1.32; /* под баблы */
+      font-size: 16px;             /* важно для iOS (чтобы не зумило) */
+      line-height: 1.32;
       color: var(--input-text);
       font-family: var(--font);
-      padding: 6px 4px;
+      padding: 6px 8px 6px 2px;    /* справа добавил — чтобы текст не лез под кнопку */
     }
     textarea::placeholder { color: var(--placeholder); }
 
     .send {
+      flex: 0 0 auto;
       width: 34px; height: 34px;
       border-radius: 999px;
       border: none;
@@ -335,6 +326,7 @@
       font-weight: 900;
       box-shadow: 0 6px 14px rgba(10,132,255,0.45);
       transition: transform .08s ease;
+      margin-bottom: 1px;          /* визуально ровнее с текстом */
     }
     .send:active { transform: translateY(1px) scale(0.98); }
     .send svg { width: 17px; height: 17px; transform: translateX(1px); }
@@ -404,7 +396,6 @@
       <div class="nav-center">
         <div class="nav-topline">
           <div class="avatar" aria-label="Аватар">
-            <!-- если img.jpg есть — покажется он, если нет — будет фолбэк -->
             <img src="./img.jpg" alt="" onerror="this.remove(); this.parentNode.querySelector('.avatar-fallback').style.display='grid'">
             <div class="avatar-fallback" style="display:none;">АФ</div>
           </div>
@@ -461,8 +452,6 @@
     let phrases = [];
     let lastSeparatorLabel = null;
     let pressedMessageEl = null;
-
-    // для серийности
     let lastMessageRow = null;
 
     const ALWAYS_TOP_SYSTEM_TEXT = "Что об этом думает Алексей Ф.?";
@@ -499,7 +488,7 @@
       sep.className = "time-separator";
       sep.textContent = label;
       chatEl.appendChild(sep);
-      lastMessageRow = null; // новая дата = новая серия
+      lastMessageRow = null;
     }
 
     function maybeAddDateSeparator(date = new Date()) {
@@ -601,7 +590,7 @@
 
     function randInt(n) { return Math.floor(Math.random()*n); }
     function pickRandomPhrase() {
-      if (!phrases.length) return "Ты долбоёб? Нахуя пустое сообщение отправил?";
+      if (!phrases.length) return "Фраз нет 😅";
       return phrases[randInt(phrases.length)];
     }
 
